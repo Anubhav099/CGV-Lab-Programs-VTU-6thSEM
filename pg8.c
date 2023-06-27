@@ -1,115 +1,125 @@
-#include <GL/glut.h>
 #include <stdio.h>
+#include <GL/glut.h>
 #include <math.h>
-#define PI 3.1416
-#define DF 5*sin(theta*PI/180.0) //DF=Displacement Factor
 
-struct Point
-{
-    float x, y;
-};
+int Anflag=0, yFlag=1, xFlag=1;
+float yC=-50,xC=-10;
+float x[4], Y1[4], Y2[4], Y3[4], Y4[4];
 
-int bp=20,n=3;
-int c[4] = {0,0,0,0};
-float theta = 0;
-void bino()
+void Menu(int id)
 {
-    int k, j;
-    for (k = 0; k <= n; k++)
+    switch(id)
     {
-        c[k] = 1;
-        for (j = n; j >= k + 1; j--)
-            c[k] *= j;
-        for (j = n - k; j >= 2; j--)
-            c[k] /= j;
+        case 1: Anflag=1; break;
+        case 2: Anflag=0; break;
+        case 3: exit(0);
     }
 }
-void computeBP(float u, struct Point* np, struct Point* p)
+
+void Idle()
 {
-    int k;
-    float blend;
-    np->x = np->y = 0.0;
-    for (k = 0; k < 4; k++)
+    if(Anflag == 1)
     {
-        blend = c[k] * pow(u, k) * pow(1 - u, n - k);
-        np->x += p[k].x * blend;
-        np->y += p[k].y * blend;
+        if(yC<50 && yFlag == 1)
+            yC = yC + 0.2;
+        if(yC>=50 && yFlag == 1)
+            yFlag = 0;
+        if(yC>-50 && yFlag == 0)
+            yC = yC - 0.2;
+        if(yC<=-50 && yFlag == 0)
+            yFlag = 1;
+
+        if(xC<20 && xFlag == 1)
+            xC = xC + 0.2;
+        if(xC>=20 && xFlag == 1)
+            xFlag = 0;
+        if(xC>-20 && xFlag == 0)
+            xC = xC - 0.2;
+        if(xC<=-20 && xFlag == 0)
+            xFlag = 1;
     }
-}
-void bezier(struct Point* p)
-{    
-    float u;
-    int k;
-    bino();
-    struct Point np;
-    glBegin(GL_LINE_STRIP);
-        for (k = 0; k <= bp; k++)
-        {
-            u = (float)k/(float)bp;
-            computeBP(u,&np,p);
-            glVertex2f(np.x,np.y);
-        }
-    glEnd();
-}
-void draw(struct Point p[])
-{
-    for (int i = 0; i < 8; i++)
-    {
-        glTranslatef(0, -0.8, 0);
-        bezier(p);
-    }
-}
-void display()
-{
-    struct Point p[4] = {{20, 100},{30, 110},{50,90},{60,100}};
-    p[1].x += DF;
-    p[1].y += DF;
-    p[2].x -= DF;
-    p[2].y -= DF;
-    p[3].x -= DF;
-    p[3].y -= DF;
-    theta += 1;
-
-    glClear(GL_COLOR_BUFFER_BIT);
-    glLineWidth(5);
-	//Draw Flag
-    glPushMatrix();
-        glColor3f(1,0,0);
-        draw(p);
-        glColor3f(1, 1, 1);
-        draw(p);
-        glColor3f(0,1,0);
-        draw(p);
-    glPopMatrix();
-
-    	//Draw Post
-    glColor3f(0.7, 0.5, 0.3);
-    glBegin(GL_LINES);
-        glVertex2f(20, 100);
-        glVertex2f(20, 40);
-    glEnd();
-
-    glFlush();
     glutPostRedisplay();
-    glutSwapBuffers();
 }
 
-void menu(int num){ exit(0); }
+void Draw()
+{
+    int i;
+    double t, xt[200], y1t[200], y2t[200], y3t[200], y4t[200];
+    glClearColor(1,1,1,1);
+    glClear(GL_COLOR_BUFFER_BIT);
+    x[0]=300-xC;    x[1]=200;   x[2]=200;   x[3]=100;
 
-int main(int argc, char** argv)
+    Y1[0]=450;    Y1[1]=450+yC;   Y1[2]=450-yC;    Y1[3]=450;
+    Y2[0]=400;    Y2[1]=400+yC;   Y2[2]=400-yC;    Y2[3]=400;
+    Y3[0]=350;    Y3[1]=350+yC;   Y3[2]=350-yC;    Y3[3]=350;
+    Y4[0]=300;    Y4[1]=300+yC;   Y4[2]=300-yC;    Y4[3]=300;
+
+    i=0;
+    for(t=0.0; t<1.0; t += 0.005)
+    {
+        xt[i] =pow(1-t,3)* x[0]+3*t* pow(1-t,2)*x[1]+3 * pow(t,2)*(1-t)*x[2] + pow(t,3)*x[3];
+        y1t[i]=pow(1-t,3)*Y1[0]+3*t* pow(1-t,2)*Y1[1]+3* pow(t,2)*(1-t)*Y1[2]+ pow(t,3)*Y1[3];
+        y2t[i]=pow(1-t,3)*Y2[0]+3*t* pow(1-t,2)*Y2[1]+3* pow(t,2)*(1-t)*Y2[2]+ pow(t,3)*Y2[3];
+        y3t[i]=pow(1-t,3)*Y3[0]+3*t* pow(1-t,2)*Y3[1]+3* pow(t,2)*(1-t)*Y3[2]+ pow(t,3)*Y3[3];
+        y4t[i]=pow(1-t,3)*Y4[0]+3*t* pow(1-t,2)*Y4[1]+3* pow(t,2)*(1-t)*Y4[2]+ pow(t,3)*Y4[3];
+        i++;
+    }
+    glColor3f(255.0/255.0, 153.0/255.0, 51.0/255.0 );
+    glBegin(GL_QUAD_STRIP);
+    for(i=0;i<200;i++)
+    {
+        glVertex2d(xt[i],y1t[i]);
+        glVertex2d(xt[i],y2t[i]);
+    }
+    glEnd();
+
+    glColor3f(1,1,1);
+    glBegin(GL_QUAD_STRIP);
+    for(i=0;i<200;i++)
+    {
+        glVertex2d(xt[i],y2t[i]);
+        glVertex2d(xt[i],y3t[i]);
+    }
+    glEnd();
+    
+    glColor3f(19.0/255.0, 136.0/255.0, 8.0/255.0 );
+    glBegin(GL_QUAD_STRIP);
+    for(i=0;i<200;i++)
+    {
+        glVertex2d(xt[i],y3t[i]);
+        glVertex2d(xt[i],y4t[i]);
+    }
+    glEnd();
+
+   glColor3f(0.5,0.5,0.5);
+   glRectf(85,460,100,0);
+   glFlush();
+}
+
+void MyInit()
+{
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluOrtho2D(0,500,0,500);
+  glMatrixMode(GL_MODELVIEW);
+
+  glutCreateMenu(Menu);
+  glutAddMenuEntry("Play Animation",1);
+  glutAddMenuEntry("Stop Animation",2);
+  glutAddMenuEntry("Exit",3);
+  glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+
+int main(int argc, char *argv[])
 {
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-    glutInitWindowPosition(50, 50);
-    glutInitWindowSize(500, 500);
-    glutCreateWindow("Bezier Curve");
-    glutDisplayFunc(display);
-    //menu to exit
-    glutCreateMenu(menu);
-    glutAddMenuEntry("Exit",0);
-    glutAttachMenu(GLUT_RIGHT_BUTTON);
-    
-    gluOrtho2D(0, 150, 0, 150);
+    glutInitWindowSize(900,900);
+    glutInitWindowPosition(10,10);
+    glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
+    glutCreateWindow("Bezier Curve Flag Animation");
+    MyInit();
+    glutDisplayFunc(Draw);
+    glutIdleFunc(Idle);
     glutMainLoop();
     return 0;
 }
