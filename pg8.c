@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
     glutInitWindowSize(900,900);
     glutInitWindowPosition(10,10);
     glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
-    glutCreateWindow("Bezier Curve Flag Animation");
+    glutCreateWindow("Anubhav Bezier Curve Flag Animation");
     MyInit();
     glutDisplayFunc(Draw);
     glutIdleFunc(Idle);

@@ -48,7 +48,7 @@ void main(int argc, char** argv)
 	float light_pos[]={27,80,2,3};
 	
 	glutInitWindowSize(700,700);
-	glutCreateWindow("scene");
+	glutCreateWindow("Anubhav Teapot");
 	glutDisplayFunc(display);
 	
 	glEnable(GL_LIGHTING);
