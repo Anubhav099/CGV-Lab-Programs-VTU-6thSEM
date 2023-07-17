@@ -7,32 +7,29 @@ int x1=200, y1=200, x2=100, y2=300, x3=200, y3=400, x4=300, y4=300;
 
 void draw_pixel(int x, int y)
 {
-    if (value == 2) glColor3f(0, 1, 0); //green filling
-    else            glColor3f(1, 1, 1); //white filling
+    if (value == 2) glColor3f(0, 1, 0);
+    else            glColor3f(1, 1, 1);
     glBegin(GL_POINTS);
         glVertex2i(x, y);
     glEnd();
-    glFlush();  // display on screen
+    glFlush();
 }
 
 void edgedetect(int x1, int y1, int x2, int y2, int *le, int *re)
 {
     int mx;
-    if( y1>y2 ) // we are scanning from bottom to top, so y1 should be less than y2, otherwise we need to write the case for that and do x -= mx for every y -= 1
+    if( y1>y2 )
     {
         int temp = y1;
-        y1 = y2;            //swap y1,y2
+        y1 = y2;
         y2 = temp;
-
         temp = x1;
-        x1 = x2;            //swap x1,x2
+        x1 = x2;
         x2 = temp;
     }
 
-    if( y2-y1 == 0) // to avoid divide by 0 error ie when line is horizontal
-        mx = (x2-x1);
-    else
-        mx = (x2-x1)/(y2-y1);
+    if( y2-y1 == 0) mx = (x2-x1);
+    else mx = (x2-x1)/(y2-y1);
 
     int x = x1;
     for(int i=y1; i<=y2; i++)
@@ -57,14 +54,14 @@ void scanfill(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
     edgedetect(x3, y3, x4, y4, le, re);
     edgedetect(x4, y4, x1, y1, le, re);
     
-    if (value == 2) //Fill
+    if (value == 2)
     {
         for(int y=0; y<500; y++)
             if(le[y] <= re[y])
                 for(int i=le[y]+1; i<re[y]-1; i++)
                     draw_pixel(i, y);
     }
-    else            //Reverese fill
+    else 
     {
         for(int y=499; y>=0; y--)
             if(le[y] <= re[y])
